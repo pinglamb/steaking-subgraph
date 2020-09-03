@@ -1,0 +1,26 @@
+specVersion: 0.0.1
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Contract
+    network: ropsten
+    source:
+      address: "0x70551c66E8De5Edc44CC8f39d12BDBf63fBeF14f"
+      abi: Contract
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.2
+      language: wasm/assemblyscript
+      entities:
+        - Staked
+        - Unstaked
+      abis:
+        - name: Contract
+          file: ./abis/Contract.json
+      eventHandlers:
+        - event: Staked(indexed address,uint256,uint256,bytes)
+          handler: handleStaked
+        - event: Unstaked(indexed address,uint256,uint256,bytes)
+          handler: handleUnstaked
+      file: ./src/mapping.ts
