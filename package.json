@@ -4,10 +4,10 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ pinglamb/steaking-subgraph",
-    "create-local": "graph create --node http://localhost:8020/ pinglamb/steaking-subgraph",
-    "remove-local": "graph remove --node http://localhost:8020/ pinglamb/steaking-subgraph",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 pinglamb/steaking-subgraph"
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ pinglamb/uno-steaking",
+    "create-local": "graph create --node http://localhost:8020/ pinglamb/uno-steaking",
+    "remove-local": "graph remove --node http://localhost:8020/ pinglamb/uno-steaking",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 pinglamb/uno-steaking"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.18.0",

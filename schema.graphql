@@ -1,6 +1,20 @@
-type ExampleEntity @entity {
+type Staking @entity {
+  # contract address
   id: ID!
-  count: BigInt!
-  user: Bytes! # address
-  amount: BigInt! # uint256
+  stakerCount: Int!
+  stakeCount: Int!
+  totalStaked: BigDecimal!
+}
+
+type Staker @entity {
+  # wallet address
+  id: ID!
+  stakeCount: Int!
+  totalStaked: BigDecimal!
+}
+
+type Stake @entity {
+  id: ID!
+  staker: Staker!
+  amount: BigDecimal!
 }

@@ -1,43 +1,45 @@
-import { BigInt } from "@graphprotocol/graph-ts"
+import { BigInt, BigDecimal } from "@graphprotocol/graph-ts"
 import { Contract, Staked, Unstaked } from "../generated/Contract/Contract"
-import { ExampleEntity } from "../generated/schema"
+import { Staking, Staker, Stake } from "../generated/schema"
+
+const STAKING_ADDRESS = '0x70551c66E8De5Edc44CC8f39d12BDBf63fBeF14f'
+let ZERO_BD = BigDecimal.fromString('0')
+
+function convertEthToDecimal(eth: BigInt): BigDecimal {
+  return eth.toBigDecimal().div(BigDecimal.fromString('1000000000000000000'))
+}
 
 export function handleStaked(event: Staked): void {
-  // Entities can be loaded from the store using a string ID; this ID
-  // needs to be unique across all entities of the same type
-  let entity = ExampleEntity.load(event.transaction.from.toHex())
-
-  // Entities only exist after they have been saved to the store;
-  // `null` checks allow to create entities on demand
-  if (entity == null) {
-    entity = new ExampleEntity(event.transaction.from.toHex())
-
-    // Entity fields can be set using simple assignments
-    entity.count = BigInt.fromI32(0)
+  let staking = Staking.load(STAKING_ADDRESS)
+  if (staking == null) {
+    staking = new Staking(STAKING_ADDRESS)
+    staking.stakerCount = 0
+    staking.stakeCount = 0
+    staking.totalStaked = ZERO_BD
   }
 
-  // BigInt and BigDecimal math are supported
-  entity.count = entity.count + BigInt.fromI32(1)
+  let staker = Staker.load(event.params.user.toHexString())
+  if (staker == null) {
+    staker = new Staker(event.params.user.toHexString())
+    staker.stakeCount = 0
+    staker.totalStaked = ZERO_BD
 
-  // Entity fields can be set based on event parameters
-  entity.user = event.params.user
-  entity.amount = event.params.amount
+    staking.stakerCount = staking.stakerCount + 1
+  }
 
-  // Entities can be written to the store with `.save()`
-  entity.save()
+  let stake = new Stake(event.transaction.hash.toHexString())
+  stake.staker = staker!.id
+  stake.amount = convertEthToDecimal(event.params.amount)
+  stake.save()
 
-  // Note: If a handler doesn't require existing field values, it is faster
-  // _not_ to load the entity from the store. Instead, create it fresh with
-  // `new Entity(...)`, set the fields that should be updated and save the
-  // entity back to the store. Fields that were not set or unset remain
-  // unchanged, allowing for partial updates to be applied.
+  staker.stakeCount = staker.stakeCount + 1
+  staker.totalStaked = convertEthToDecimal(event.params.total)
+  staker.save()
 
-  // It is also possible to access smart contracts from mappings. For
-  // example, the contract that has emitted the event can be connected to
-  // with:
-  //
-  // let contract = Contract.bind(event.address)
-  //
+  staking.stakeCount = staking.stakeCount + 1
+  staking.totalStaked = staking.totalStaked + stake.amount
+  staking.save()
+
   // The following functions can then be called on this contract to access
   // state variables and other data:
   //
